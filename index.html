@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title></title>
+		<meta name="viewport" content="width=device-width,initial-scale=1.0,user-scalable=no"/>
+		<script type="text/javascript" src="js/jquery-1.12.4.js"></script>
+		<style type="text/css">
+			html,body{
+				height: 100%;
+				overflow: hidden;
+				margin: 0;
+				padding: 0;
+			}
+		</style>
+		<link rel="stylesheet" href="css/index.css">
+	</head>
+	<body>
+		<div id="write">
+			<span id="gz">
+				用手指向上滑动小球<br />看看它能滚多远<br />当心掉沟里哦！
+			</span>
+			<button id="ks">开始游戏</button>
+		</div>
+		<div id="wrap">
+			<ul id="runway"></ul>
+			<div id="xq">		
+			</div>
+		</div>
+		<div id="blank">
+			<div id="pjq">
+				<img src="img/timg.jpg" alt="" id="tp"/><br />
+				<p id="pj"></p>
+			</div>
+			<button id="ref">我还要滚</button>
+		</div>
+		
+		<script type="text/javascript" src="js/transformCss.js"></script>
+		<script type="text/javascript">
+			//开始游戏
+			gz=document.getElementById("write")
+			ks=document.getElementById("ks")
+			ks.addEventListener("touchend",function(){
+				gz.style.display="none"
+			})
+			
+			//清除默认样式并开启适配
+			document.addEventListener("touchstart",function(ev){
+				ev.preventDefault();
+			})
+			width=document.documentElement.clientHeight/28;
+			styleNode=document.createElement("style");
+			styleNode.innerHTML="html{font-size:"+width+"px}"
+			document.head.appendChild(styleNode);
+			 runway=document.getElementById("runway")
+			//动态创建跑道
+			var text1=""
+			var translateY=0;
+			for(i=0;i<1000;i++){
+				text1+="<li>"+(999-i)+"</li>"
+			}
+			$("#runway").append(text1);
+			translateY=$('html').innerHeight()-$("#runway").innerHeight();
+			transformCss(runway,"translateY",translateY)
+			
+			//
+			wrap=document.getElementById("wrap")
+			xq=document.getElementById("xq")
+			blank=document.getElementById("blank")
+			pj=document.getElementById("pj")
+			
+			var xqY=0;
+			var xqX=0;
+			var xqstratX=0;
+			var xqstratY=0;
+			var xqnowX=0;
+			var xqnowY=0;
+			var xqlateX=0;
+			var xqlateY=0;
+			var xqlateY1=0
+			var timer=0;
+			var timestrat=0;
+			var timeend=0;
+			
+			xq.addEventListener("touchstart",function(ev){
+				touch1=ev.changedTouches[0];
+				xqY=transformCss(xq,"translateY")
+				xqX=transformCss(xq,"translateX")
+				xqstratX=touch1.clientX;
+				xqstratY=touch1.clientY;
+				xq.style.transition=""
+				timestart=new Date().getTime();
+				console.log(timestart)
+			}
+			)
+			xq.addEventListener("touchend",function(ev){
+				timeend=new Date().getTime();
+				console.log(timeend)
+				if(timeend-timestart>=500){
+					alert("兄弟，别投机取巧，你得\'sou~\ 的一声滚出去'")
+//					location.reload(true);
+					return;
+				}
+				touch1=ev.changedTouches[0];
+				xqnowX=touch1.clientX;
+				xqnowY=touch1.clientY;
+				xqlateX=(xqnowX-xqstratX+xqX)*50;
+				xqlateY=(xqnowY-xqstratY+xqY)*50;
+				timer=-xqlateY/1000;
+				xq.style.transition=timer+"s";
+				if(xqlateY<-document.documentElement.clientHeigh*0.8){
+					transformCss(xq,"translateX",xqlateX);
+					transformCss(xq,"translateY",xqlateY);
+				}else{
+					xqlateY1=-document.documentElement.clientHeight*0.8;
+					transformCss(xq,"translateX",xqlateX);
+					transformCss(xq,"translateY",xqlateY);
+					timer1=-xqlateY1/1000;
+					console.log(document.documentElement.clientHeight)
+					xq.style.transition=timer+"s"+" cubic-bezier(.26,.53,.54,.77) "+" 0s";
+                    
+                    //
+                    //设置x轴的边界
+                    	tp=document.getElementById("tp");
+                    	bjx=document.documentElement.clientWidth/2-(xq.offsetWidth/2);
+                    	console.log("边界"+bjx)
+                    	var xqX1=0
+                    	var scale=document.documentElement.clientHeight/28*2;
+                    	xqX1=Math.abs(transformCss(xq,"translateX"));
+                    		if(xqX1<-bjx||xqX1>bjx){
+                    			timebj=timer*(bjx/xqX1)
+                    			//此处是估计值，没办法通过线性计算得出一个非线性计算的中间值
+                    			//计算一个刻度是多少像素，
+                    			cj=-parseInt(xqlateY*(timebj/timer)/scale)
+                    			if(timebj<0){
+                    				timebj=-timebj;
+                    			}
+                    			timebj=parseInt(timebj*100)
+                    			console.log("边界时间"+timebj)
+                    			var timerZ=0
+                    			console.log(timerZ)
+                    			setInterval(function(){
+                    				timerZ+=10;
+                    				console.log(timerZ)
+                    				if(timerZ==timebj*10){
+                    					blank.style.display="block"
+                    					pj.innerHTML+="哈哈 掉坑里了o...你滚了"+cj+"米"
+                    					
+                    				}
+                    			},10)
+							}else{
+								cj=-parseInt(xqlateY/scale)
+								var timerZ=0
+                    			setInterval(function(){
+                    				time2=parseInt(timer*100)
+                    				timerZ+=10;
+                    				console.log(timerZ)
+                    				if(timerZ==time2*10){
+                    					blank.style.display="block"
+                    					pj.innerHTML+="你怎么这么能滚...你滚了"+cj+"米"
+                    					tp.src="img/timg (1).jpg"
+                    				}
+                    			},10)
+							}
+                    //
+				transformCss(wrap,"translateY",-(xqlateY-xqlateY1));
+				wrap.style.transition=(timer-timer1)+"s"+" cubic-bezier(.28,.51,.54,.77) "+" 0s ";
+				}	
+			}
+			
+
+			)
+						//再玩一局
+			btn=document.getElementById("ref")
+			ref.addEventListener("touchend",function(){
+				location.reload(true);
+			})
+		</script>
+	</body>
+</html>
